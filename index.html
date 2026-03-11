@@ -12,7 +12,7 @@
             --text-main: #1f2328;
             --text-secondary: #636c76;
             --accent-color: #0969da;
-            --btn-friend: #6c5ce7; /* Violet bleu */
+            --btn-friend: #6c5ce7;
             --border-color: #d0d7de;
         }
 
@@ -23,7 +23,7 @@
                 --text-main: #c9d1d9;
                 --text-secondary: #8b949e;
                 --accent-color: #58a6ff;
-                --btn-friend: #703cdd; /* Violet bleu plus clair pour le mode sombre */
+                --btn-friend: #703cdd;
                 --border-color: #30363d;
             }
         }
@@ -113,49 +113,36 @@
             text-align: left;
             line-height: 1.6;
         }
-    </style>
-</head>
-<body>
 
-    <div class="card">
-        <img src="https://github.com/pixelstrike56.png" alt="Pixelstrike56 Avatar" class="avatar">
-        <h1>Pixelstrike56</h1>
-        
-        <div class="bio">
-            <p>Bonjour ! 👋 voici mon tout premier<b>site</b> je suis au lycée en seconde er j'ai eu l'idée de faire un site ici cest cest la v1</p>
-            <div>
-              <span class="badge">2MTNE</span>
-                <span class="badge">Vers BAC PRO CIEL</span>
-            </div>
-        </div>
-
-        <div class="btn-container">
-            <button class="btn btn-config" onclick="toggleConfig()">
-                <i class="fa-solid fa-laptop"></i> Ma Config PC
-            </button>
-            
-            <div id="config-details">
-                <b>Laptop :</b> Lenovo Thinkpad P52<br>
-                <b>CPU :</b> Intel Core i7-8750H<br>
-                <b>GPU :</b> Nvidia Quadro P1000<br>
-                <b>OS :</b> EndeavourOS
-            </div>
-
-            <a href="https://artbysekai.fr" target="_blank" class="btn btn-friend">
-                Site de mon collègue 
-            </a>
-        </div>
-    </div>
-
-    <script>
-        function toggleConfig() {
-            var details = document.getElementById("config-details");
-            if (details.style.display === "block") {
-                details.style.display = "none";
-            } else {
-                details.style.display = "block";
-            }
+        /* Menu collègues */
+        #colleagues-details {
+            margin-top: 0;
+            padding: 0 15px;
+            background: rgba(108, 92, 231, 0.08);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            text-align: left;
+            line-height: 1.6;
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.3s ease, padding 0.3s ease;
         }
-    </script>
-</body>
-</html>
+
+        #colleagues-details.open {
+            display: block;
+            max-height: 200px;
+            padding: 12px 15px;
+        }
+
+        #colleagues-details a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--btn-friend);
+            text-decoration: none;
+            padding: 8px 4px;
+            border-bottom: 1px solid rgba(108, 92, 231, 0.15);
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
