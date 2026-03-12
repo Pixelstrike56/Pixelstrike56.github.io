@@ -7,13 +7,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #0d1117;
-            --card-bg: #161b22;
-            --text-main: #c9d1d9;
-            --text-secondary: #8b949e;
-            --accent-color: #58a6ff;
-            --btn-friend: #703cdd;
-            --border-color: #30363d;
+            --bg-color: #f6f8fa;
+            --card-bg: rgba(255,255,255,0.85);
+            --text-main: #1f2328;
+            --text-secondary: #636c76;
+            --accent-color: #0969da;
+            --btn-friend: #6c5ce7;
+            --border-color: #d0d7de;
+            --star-color: 80, 100, 160;
+            --meteor-opacity: 0.45;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0d1117;
+                --card-bg: rgba(22, 27, 34, 0.85);
+                --text-main: #c9d1d9;
+                --text-secondary: #8b949e;
+                --accent-color: #58a6ff;
+                --btn-friend: #703cdd;
+                --border-color: #30363d;
+                --star-color: 200, 220, 255;
+                --meteor-opacity: 1;
+            }
         }
 
         * { box-sizing: border-box; }
@@ -28,9 +44,9 @@
             min-height: 100vh;
             margin: 0;
             overflow: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Canvas de fond */
         #meteor-canvas {
             position: fixed;
             top: 0; left: 0;
@@ -42,16 +58,17 @@
         .card {
             position: relative;
             z-index: 1;
-            background: rgba(22, 27, 34, 0.85);
+            background: var(--card-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             padding: 2.5rem;
             border-radius: 16px;
             border: 1px solid var(--border-color);
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             max-width: 450px;
             width: 90%;
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         .avatar {
@@ -106,9 +123,8 @@
         .btn-friend { background: var(--btn-friend); color: white; }
 
         #config-details {
-            margin-top: 20px;
             padding: 15px;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.05);
             border-radius: 8px;
             font-size: 0.95rem;
             display: none;
@@ -167,7 +183,7 @@
     <h1>Pixelstrike56</h1>
 
     <div class="bio">
-        <p>Bonjour ! 👋 voici mon tout premier <b>site</b> je suis au lycée en seconde er j'ai eu l'idée de faire un site ici cest cest la v3</p>
+        <p>Bonjour ! 👋 voici mon tout premier <b>site</b> je suis au lycée en seconde er j'ai eu l'idée de faire un site ici cest cest la v4</p>
         <div>
             <span class="badge">2MTNE</span>
             <span class="badge">Vers BAC PRO CIEL</span>
@@ -203,7 +219,6 @@
 </div>
 
 <script>
-    // ── Menus toggle ──────────────────────────────────────────
     function toggleConfig() {
         var d = document.getElementById("config-details");
         d.style.display = d.style.display === "block" ? "none" : "block";
@@ -224,7 +239,26 @@
         }
     }
 
-    // ── Fond météores ─────────────────────────────────────────
+    // ── Détection thème clair/sombre ──────────────────────────
+    const darkMQ = window.matchMedia("(prefers-color-scheme: dark)");
+
+    function isDark() { return darkMQ.matches; }
+
+    // Couleurs météores selon le thème
+    function getMeteorColors() {
+        return isDark()
+            ? ["255,255,255", "120,180,255", "160,100,255", "200,220,255"]
+            : ["80,100,200",  "100,80,200",  "60,80,180",   "120,100,220"];
+    }
+
+    function getStarColor() {
+        return isDark() ? [200, 220, 255] : [80, 100, 180];
+    }
+
+    function getStarAlphaMax() { return isDark() ? 0.8 : 0.35; }
+    function getMeteorAlphaMax() { return isDark() ? 0.9 : 0.4; }
+
+    // ── Canvas météores ───────────────────────────────────────
     const canvas = document.getElementById("meteor-canvas");
     const ctx = canvas.getContext("2d");
 
@@ -235,66 +269,61 @@
     resize();
     window.addEventListener("resize", resize);
 
-    // Étoiles fixes en arrière-plan
+    // Étoiles fixes
     const stars = Array.from({ length: 120 }, () => ({
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
         r: Math.random() * 1.5 + 0.3,
-        alpha: Math.random() * 0.6 + 0.2
+        alpha: Math.random() * 0.6 + 0.1
     }));
 
-    // Classe Météore
     class Meteor {
         constructor() { this.reset(true); }
 
         reset(initial = false) {
-    // Choisit un bord aléatoire : haut, gauche ou droite
-    const side = Math.floor(Math.random() * 3); // 0=haut, 1=gauche, 2=droite
+            const side = Math.floor(Math.random() * 3);
 
-    if (initial) {
-        // Au démarrage : position aléatoire partout sur l'écran
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-    } else if (side === 0) {
-        // Bord haut
-        this.x = Math.random() * canvas.width;
-        this.y = -20;
-    } else if (side === 1) {
-        // Bord gauche
-        this.x = -20;
-        this.y = Math.random() * canvas.height;
-    } else {
-        // Bord droit
-        this.x = canvas.width + 20;
-        this.y = Math.random() * canvas.height;
-    }
+            if (initial) {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+            } else if (side === 0) {
+                this.x = Math.random() * canvas.width;
+                this.y = -20;
+            } else if (side === 1) {
+                this.x = -20;
+                this.y = Math.random() * canvas.height;
+            } else {
+                this.x = canvas.width + 20;
+                this.y = Math.random() * canvas.height;
+            }
 
-    // Direction vers le centre de l'écran + légère variation
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const baseAngle = Math.atan2(centerY - this.y, centerX - this.x);
-    this.angle = baseAngle + (Math.random() - 0.5) * 0.8;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const baseAngle = Math.atan2(centerY - this.y, centerX - this.x);
+            this.angle = baseAngle + (Math.random() - 0.5) * 0.8;
 
-    this.len = Math.random() * 120 + 60;
-    this.speed = Math.random() * 4 + 3;
-    this.alpha = Math.random() * 0.7 + 0.3;
-    this.width = Math.random() * 1.5 + 0.5;
-    const colors = ["255,255,255", "120,180,255", "160,100,255", "200,220,255"];
-    this.color = colors[Math.floor(Math.random() * colors.length)];
-    this.fade = 0;
+            this.len   = Math.random() * 120 + 60;
+            this.speed = Math.random() * 4 + 3;
+            this.alpha = Math.random() * 0.5 + 0.2;
+            this.width = Math.random() * 1.5 + 0.5;
+            const colors = getMeteorColors();
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+            this.fade  = 0;
         }
 
         update() {
             this.x += Math.cos(this.angle) * this.speed;
             this.y += Math.sin(this.angle) * this.speed;
             this.fade += 0.012;
-            if (this.x > canvas.width + 50 || this.y > canvas.height + 50 || this.fade >= 1) {
+            if (this.x > canvas.width + 50 || this.x < -50 ||
+                this.y > canvas.height + 50 || this.y < -50 || this.fade >= 1) {
                 this.reset();
             }
         }
 
         draw() {
-            const opacity = this.alpha * (1 - this.fade);
+            const maxAlpha = getMeteorAlphaMax();
+            const opacity  = Math.min(this.alpha, maxAlpha) * (1 - this.fade);
             const tailX = this.x - Math.cos(this.angle) * this.len;
             const tailY = this.y - Math.sin(this.angle) * this.len;
 
@@ -310,7 +339,6 @@
             ctx.lineCap = "round";
             ctx.stroke();
 
-            // Point brillant à la tête
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.width * 1.2, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(${this.color}, ${opacity})`;
@@ -323,21 +351,29 @@
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Dessin des étoiles
+        // Étoiles — couleur et opacité adaptées au thème
+        const [sr, sg, sb] = getStarColor();
+        const alphaMax = getStarAlphaMax();
         stars.forEach(s => {
             ctx.beginPath();
             ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(200, 220, 255, ${s.alpha})`;
+            ctx.fillStyle = `rgba(${sr}, ${sg}, ${sb}, ${s.alpha * alphaMax / 0.8})`;
             ctx.fill();
         });
 
-        // Dessin des météores
         meteors.forEach(m => { m.update(); m.draw(); });
-
         requestAnimationFrame(animate);
     }
 
     animate();
+
+    // Recalcule les couleurs si l'OS change de thème en live
+    darkMQ.addEventListener("change", () => {
+        meteors.forEach(m => {
+            const colors = getMeteorColors();
+            m.color = colors[Math.floor(Math.random() * colors.length)];
+        });
+    });
 </script>
 </body>
 </html>
