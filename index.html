@@ -185,7 +185,7 @@
     <h1>Pixelstrike56</h1>
 
     <div class="bio">
-        <p>Bonjour ! 👋 voici mon tout premier <b>site</b> je suis au lycée en seconde et j'ai eu l'idée de faire un site, ici cest la v5.</p>
+        <p>Bonjour ! 👋 voici mon tout premier <b>site</b> je suis au lycée en seconde et j'ai eu l'idée de faire un site, ici cest la v6.</p>
         <div>
             <span class="badge">2MTNE</span>
             <span class="badge">Vers BAC PRO CIEL</span>
@@ -289,34 +289,36 @@
         constructor() { this.reset(true); }
 
         reset(initial = false) {
-            const side = Math.floor(Math.random() * 3);
+    const side = Math.floor(Math.random() * 3);
 
-            if (initial) {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-            } else if (side === 0) {
-                this.x = Math.random() * canvas.width;
-                this.y = -20;
-            } else if (side === 1) {
-                this.x = -20;
-                this.y = Math.random() * canvas.height;
-            } else {
-                this.x = canvas.width + 20;
-                this.y = Math.random() * canvas.height;
-            }
+    if (initial) {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+    } else if (side === 0) {
+        // Bord haut
+        this.x = Math.random() * canvas.width;
+        this.y = -20;
+    } else if (side === 1) {
+        // Bord gauche
+        this.x = -20;
+        this.y = Math.random() * canvas.height * 0.6;
+    } else {
+        // Bord droit
+        this.x = canvas.width + 20;
+        this.y = Math.random() * canvas.height * 0.6;
+    }
 
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const baseAngle = Math.atan2(centerY - this.y, centerX - this.x);
-            this.angle = baseAngle + (Math.random() - 0.5) * 0.8;
+    // Direction : vers le bas avec inclinaison ~45° légèrement variable
+    const baseAngle = Math.PI / 2 + (Math.random() - 0.5) * 0.7;
+    this.angle = baseAngle;
 
-            this.len   = Math.random() * 120 + 60;
-            this.speed = Math.random() * 4 + 3;
-            this.alpha = Math.random() * 0.5 + 0.2;
-            this.width = Math.random() * 1.5 + 0.5;
-            const colors = getMeteorColors();
-            this.color = colors[Math.floor(Math.random() * colors.length)];
-            this.fade  = 0;
+    this.len   = Math.random() * 120 + 60;
+    this.speed = Math.random() * 4 + 3;
+    this.alpha = Math.random() * 0.5 + 0.2;
+    this.width = Math.random() * 1.5 + 0.5;
+    const colors = getMeteorColors();
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+    this.fade  = 0;
         }
 
         update() {
